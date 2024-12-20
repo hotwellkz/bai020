@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Профили пользователей
+    match /profiles/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false; // Запрещаем удаление профилей
+    }
+    
+    // Завершенные уроки
+    match /completed_lessons/{docId} {
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+      allow update: if false; // Запрещаем изменение завершенных уроков
+      allow delete: if false; // Запрещаем удаление завершенных уроков
+    }
+  }
+}
